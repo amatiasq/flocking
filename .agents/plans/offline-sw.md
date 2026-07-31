@@ -19,7 +19,7 @@ story; pulling that dependency in here would be more configuration than the app.
 `sanremo` is the reference implementation and this project is a strictly simpler
 case — copy it rather than inventing:
 
-- `sanremo/scripts/build-sw.ts` walks `dist/` after the bundler, precaches every
+- `sanremo/amq/amq-sanremo-build-sw` walks `dist/` after the bundler, precaches every
   emitted file, and derives the cache name from a SHA of the sorted file list.
 - `sanremo/src/main.ts` registers it behind `import.meta.env.PROD`.
 
@@ -29,13 +29,18 @@ rather than porting it as dead code.
 
 ## Steps
 
-1. **Add `scripts/build-sw.ts`**, adapted from sanremo: walk `dist/`, filter out
-   `sw.js` itself and `*.map`, fold `/index.html` to `/`, hash the list into the
-   cache name, emit `dist/sw.js`. Cache-first, with navigations falling back to
-   the cached shell.
+1. **Add `amq/amq-flocking-build-sw`**, adapted from sanremo's: walk `dist/`,
+   filter out `sw.js` itself and `*.map`, fold `/index.html` to `/`, hash the
+   list into the cache name, emit `dist/sw.js`. Cache-first, with navigations
+   falling back to the cached shell.
+
+   It is an `amq` command like the rest of `amq/` — an extensionless executable,
+   so node can't type-strip it. Sanremo's is plain JS with a `#!/usr/bin/env node`
+   shebang for exactly that reason; keep that shape.
 2. **Hook it into the build.** `package.json` `build` is currently
-   `tsc --noEmit && vite build`; append the generator so it runs on the finished
-   `dist/`. `amq flocking check` runs `bun run build`, so CI covers it for free.
+   `tsc --noEmit && vite build`; append `./amq/amq-flocking-build-sw` so it runs
+   on the finished `dist/`. `amq flocking check` runs `bun run build`, so CI
+   covers it for free.
 3. **Register in `src/index.ts`**, production only:
    ```ts
    if (import.meta.env.PROD && 'serviceWorker' in navigator) {
