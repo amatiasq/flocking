@@ -2,6 +2,13 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // Emit relative asset paths. This is published to GitHub Pages under a
+  // SUBPATH (amatiasq.github.io/flocking/), where Vite's default absolute
+  // `/assets/...` resolves against the domain root and 404s — the page loads and
+  // the bundle silently does not, which looks like a broken simulation rather
+  // than a broken deploy. `./` works from any prefix, including file://.
+  base: './',
+
   // Point `assert` at a tiny local shim. The npm polyfill needs `process`/`util`
   // and throws in the browser bundle; the shim works in both browser and node.
   resolve: {
