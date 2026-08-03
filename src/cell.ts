@@ -93,27 +93,23 @@ function renderAt(
   cell: Cell,
   pos = cell.position,
 ) {
-  const withBeak = false;
-
   context.save();
   context.translate(pos.x, pos.y);
 
   context.rotate(radians(cell.velocity) + ANGLE_CORRECTION);
   context.beginPath();
-  context.arc(0, 0, cell.radius, 0, Math.PI * (withBeak ? 1.5 : 2));
 
-  if (withBeak) {
-    context.lineTo(cell.radius, -cell.radius);
-  }
+  // A drop, not a disc: three quarters of a circle, then a corner where the
+  // remaining quarter would be. Rotated by the heading, that corner is the nose,
+  // and the flock reads as a direction instead of as confetti.
+  context.arc(0, 0, cell.radius, 0, Math.PI * 1.5);
+  context.lineTo(cell.radius, -cell.radius);
 
-  // context.lineTo(cell.radius, 0);
   context.closePath();
   context.lineWidth = 5;
 
-  // ESTA LINEA LA PUSO EL FACU
-  context.strokeStyle = lowerColor('#0000ff' as Color, 0.5);
-
-  // context.strokeStyle = lowerColor(cell.color, 0.7);
+  // Each cell outlined in its own colour, filled with the same colour darkened.
+  context.strokeStyle = cell.color;
   context.fillStyle = lowerColor(cell.color, 0.5);
   context.stroke();
   context.fill();
