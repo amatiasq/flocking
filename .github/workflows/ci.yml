@@ -6,6 +6,14 @@ on:
       - main
       - master
 
+# The deploy step pushes a gh-pages branch, so GITHUB_TOKEN needs to be able to
+# write to the repo. Without this it defaults to read-only and the job fails at
+# the very last command with "Permission to amatiasq/flocking.git denied to
+# github-actions[bot]" — which is exactly what happened, silently, from the day
+# this project was renamed and started mirroring to a fresh repository.
+permissions:
+  contents: write
+
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
