@@ -1,4 +1,5 @@
-import { Cell, cellDistance, renderCell } from './cell';
+import { Cell, cellDistance, cloneCell, renderCell } from './cell';
+import { CellIndex, indexCells } from './spatial';
 import { Vector } from './vector';
 
 export interface World {
@@ -29,13 +30,19 @@ export function simulation({
   const context = canvas.getContext('2d')!;
   const renderCellToContext = renderCell.bind(null, context, world);
 
+  // The previous frame, indexed. Rebuilt at the top of every step because every
+  // cell has just moved; `look` reads it for the whole pass.
+  let index: CellIndex = indexCells(cells);
+
   return {
     get cells() {
       return cells;
     },
     step() {
+      index = indexCells(cells);
+
       cells = cells.map((x) => {
-        const cell = { ...x };
+        const cell = cloneCell(x);
         behaviors.forEach((b) => b(cell, world));
         return cell;
       });
@@ -49,11 +56,19 @@ export function simulation({
   };
 
   function look(target: Cell, radius: number): Cell[] {
+    // The tree answers with a SQUARE of side 2*radius; the distance filter cuts
+    // it down to the circle. Same predicate as the old full-flock scan, only
+    // the candidate set is smaller — O(log n + k) instead of O(n).
+    //
     // Compare by id: `target` is the mid-step copy, never identity-equal to the
-    // originals still in `cells`.
-    return cells.filter(
-      (x) => x.id !== target.id && cellDistance(target, x) < radius,
-    );
+    // originals in the index.
+    //
+    // Known limitation, unchanged from the brute-force version: neighbours
+    // across a `roundMap` seam are not seen. Fixing it means querying up to
+    // four wrapped boxes, the way `lulas/src/spatial.ts` does.
+    return index
+      .within(target.position, radius)
+      .filter((x) => x.id !== target.id && cellDistance(target, x) < radius);
   }
 }
 

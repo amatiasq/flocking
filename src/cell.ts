@@ -17,11 +17,21 @@ import {
 
 const ANGLE_CORRECTION = Math.PI / 4;
 
-export type CellId = '[number CellId]';
+/**
+ * A number, branded so one cannot be passed where a plain number is meant.
+ *
+ * It used to be declared as the string literal `'[number CellId]'` while
+ * holding a number forced through `as any` — the type said one thing, the
+ * runtime held another, and the cast switched off the checking that would have
+ * said so. Anything that trusted the type (a string operation on an id) was
+ * wrong and compiled anyway.
+ */
+export type CellId = number & { readonly __brand: 'CellId' };
+
 let lastId = 0;
 
-function getNextId() {
-  return (lastId++ as any) as CellId;
+function getNextId(): CellId {
+  return lastId++ as CellId;
 }
 
 export interface Cell {
@@ -46,6 +56,22 @@ export function createCell(partial?: Partial<Cell>): Cell {
       (partial && partial.radius ? partial.radius : DEFAULT_RADIUS) *
       DEFAULT_VISION_FACTOR,
     ...partial,
+  };
+}
+
+/**
+ * The next frame's copy of a cell. Deep on the three mutable vectors and only
+ * those: `{ ...cell }` shares them with the previous frame, so a behaviour that
+ * writes `position.x` in place scribbles on the very cell `look()` is still
+ * handing to everyone else in the same pass. Kept here, next to `Cell`, so the
+ * copy list cannot drift from the shape.
+ */
+export function cloneCell(cell: Cell): Cell {
+  return {
+    ...cell,
+    position: { ...cell.position },
+    velocity: { ...cell.velocity },
+    acceleration: { ...cell.acceleration },
   };
 }
 

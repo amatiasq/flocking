@@ -17,7 +17,8 @@ test('A cell in (0,0) will have position adjusted to fit the screen', () => {
 
   sut.step();
 
-  vectorAxis((axis) => equal(cell.position[axis], 5, axis));
+  const [stepped] = sut.cells;
+  vectorAxis((axis) => equal(stepped.position[axis], 5, axis));
 });
 
 test('A cell in (0,0) will have velocity adjusted to bounce on screen', () => {
@@ -29,7 +30,8 @@ test('A cell in (0,0) will have velocity adjusted to bounce on screen', () => {
 
   sut.step();
 
-  vectorAxis((axis) => equal(cell.velocity[axis], 1, axis));
+  const [stepped] = sut.cells;
+  vectorAxis((axis) => equal(stepped.velocity[axis], 1, axis));
 });
 
 test('A cell outside of the window will have position adjusted to fit the screen', () => {
@@ -43,7 +45,8 @@ test('A cell outside of the window will have position adjusted to fit the screen
 
   sut.step();
 
-  vectorAxis((axis) => equal(cell.position[axis], 195, axis));
+  const [stepped] = sut.cells;
+  vectorAxis((axis) => equal(stepped.position[axis], 195, axis));
 });
 
 test('A cell outside of the window will have velocity adjusted to bounce on screen', () => {
@@ -60,5 +63,6 @@ test('A cell outside of the window will have velocity adjusted to bounce on scre
 
   sut.step();
 
-  vectorAxis((axis) => equal(cell.velocity[axis], -1, axis));
+  const [stepped] = sut.cells;
+  vectorAxis((axis) => equal(stepped.velocity[axis], -1, axis));
 });

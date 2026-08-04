@@ -30,6 +30,8 @@ test(
 
     sut.step();
 
-    vectorAxis((axis) => equal(cell.position[axis], exp[axis]));
+    // The next frame: `step()` double-buffers and leaves `cell` untouched.
+    const [stepped] = sut.cells;
+    vectorAxis((axis) => equal(stepped.position[axis], exp[axis]));
   },
 );

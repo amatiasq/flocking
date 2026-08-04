@@ -40,6 +40,9 @@ test(
 
     sut.step();
 
-    vectorAxis((axis) => assertEqual(cell.position[axis], exp[axis]));
+    // Read the NEXT frame, not the cell that went in: `step()` double-buffers,
+    // so the input is left exactly as it was.
+    const [stepped] = sut.cells;
+    vectorAxis((axis) => assertEqual(stepped.position[axis], exp[axis]));
   },
 );

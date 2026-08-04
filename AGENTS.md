@@ -18,13 +18,18 @@ take the `flocking` name.
 
 `src/simulation.ts` is the engine. `simulation(config)` returns `{ cells, step, render }`:
 
-- **`step()`** advances one tick: `cells.map(x => { cell = {...x}; behaviors
-  .forEach(b => b(cell, world)); return cell })`. Behaviors are pure-ish
-  functions `(cell, world) => void` that mutate the cell (apply forces, move,
-  wrap). They run **in array order per cell** — order matters (see invariants).
+- **`step()`** advances one tick: `cells.map(x => { cell = cloneCell(x);
+  behaviors.forEach(b => b(cell, world)); return cell })`. Behaviors are
+  pure-ish functions `(cell, world) => void` that mutate the cell (apply forces,
+  move, wrap). They run **in array order per cell** — order matters (see
+  invariants). It is a **double buffer**: `cloneCell` deep-copies the three
+  mutable vectors, so the frame that went in is never written to.
 - **`world.look(cell, radius)`** returns cells within `radius` of `cell`,
-  excluding it (by `id` — see invariant 1). Reads the previous-frame `cells`
-  array. O(n²); see [`.agents/plans/quadtree.md`](.agents/plans/quadtree.md).
+  excluding it (by `id` — see invariant 1). Answered by a **quadtree**
+  (`src/spatial.ts`, `@amatiasq/quadtree`) rebuilt from the previous frame at
+  the top of every `step()`: a box query of side `2*radius`, then the same
+  distance filter as the old full scan. ~O(log n + k) instead of O(n) per call
+  — measured 10.6 → 1.6 ms/tick at 1000 cells.
 - **`render()`** draws each cell as a rotated arc, re-drawing near-edge cells on
   the opposite side so the wrap looks seamless.
 
@@ -32,6 +37,10 @@ A **Cell** (`src/cell.ts`) is `{ id, color, position, velocity, acceleration,
 radius, vision }`. Forces accumulate in `acceleration`; `move` integrates it
 into `velocity` (capped at `MAX_SPEED`) then `position`, and zeroes it. `vision`
 = `radius * DEFAULT_VISION_FACTOR` — the flocking/collision look radius.
+`CellId` is a **branded number** (`number & { __brand }`) — it is only ever
+compared and printed. `Color` in `color.ts` still uses the old
+`'[string Color]'` literal-brand trick; there the value really is a string, so
+it is ugly rather than wrong.
 
 All the tuning knobs live in `src/CONFIGURATION.ts` (speeds, forces, flocking
 weights, collision friction). Vector math is in `src/vector.ts`; everything
@@ -54,22 +63,40 @@ Space pauses. It runs the test suite first via `runTests()`.
 
 ## Easy to break
 
-1. **`step()` shallow-copies cells (`{...x}`), so nested vectors are shared.**
-   `position`/`velocity`/`acceleration` are the *same objects* on the old and
-   new cell. Behaviors that mutate a vector in place (`applyForce` does
-   `acceleration.x += …`; `solidBody` writes both cells' positions) therefore
-   also mutate the previous frame's cell. Known bug, fix planned —
-   [`.agents/plans/import-fixes.md`](.agents/plans/import-fixes.md) #1 (move to
-   a real double-buffer). Don't deep-copy piecemeal before reading that.
+1. **`step()` does not touch the frame it was given.** `cloneCell` deep-copies
+   `position`/`velocity`/`acceleration`, so behaviours that write a vector in
+   place (`applyForce` does `acceleration.x += …`) only ever write to their own
+   copy. The quadtree depends on this: it freezes the previous frame, so a
+   behaviour scribbling on that frame would make the index disagree with the
+   cells it indexed. **A spec asserts it** (user story 8); don't "optimise" the
+   clone away. It also means a test cannot read its result off the cell it
+   passed in — read `sut.cells`.
 
 2. **Behavior order is the physics.** Force-appliers (`flocking`, `attractor`,
    `solidBody`) must run before `move` (which consumes acceleration), and
    `roundMap`/`bounceOnCorners` must run after `move` (they correct the new
    position). Reordering silently changes behaviour.
 
-3. **`solidBody` double-counts collisions.** Runs per-cell but mutates both
-   members of a pair, so each pair resolves twice and non-deterministically.
-   Fix planned — `import-fixes.md` #3.
+3. **`solidBody` resolves only the cell it was given.** It reads neighbours from
+   `look()` — previous-frame cells, which every other cell is still reading this
+   pass — and must never write to one. Each member of a pair pushes *itself*
+   away by **half** the overlap and adopts the other's previous velocity damped;
+   the pair ends up exactly touching, in either order. Two specs in user story 5
+   hold the line: the neighbour is untouched, and a pair resolves the same
+   whichever member is stepped first. Note a cell overlapping *two* others still
+   adopts the velocity of whichever it looked at last — order-dependent, and out
+   of scope of that fix.
+
+4. **`look()` does not wrap.** The quadtree is queried with one box, so a cell
+   by an edge does not see its neighbours across the seam. Unchanged from the
+   brute-force version (which was pure distance, no wrap), and the reason the
+   flock thins at the borders. `lulas/src/spatial.ts` shows the fix: split the
+   query at the seams and ask up to four boxes.
+
+5. **The spatial index is a snapshot.** Rebuilt at the top of `step()` and never
+   updated during the pass. Anything that moves a cell mid-pass is invisible to
+   `look()` until the next tick — which is the double buffer's promise, not a
+   defect. Don't add an incremental update without re-reading user story 8.
 
 ## The test harness (`test/index.ts`)
 
@@ -88,6 +115,14 @@ sim. Don't reintroduce browser-side test running.
 
 Runs on **Bun + Vite 8 + Vitest 4 + TypeScript 7** (`bun.lock`; never npm).
 `amq flocking dev|test|build|check` (`check` mirrors `.github/workflows/ci.yml`).
+
+- **This project joins the `mono/npm` workspace** (`"workspaces": ["../npm/*"]`)
+  to depend on `@amatiasq/quadtree` and `@amatiasq/geometry` as `workspace:*`.
+  The standalone repo has neither, so `amq mono push-subtree` strips
+  `workspaces` and pins the published versions on the way out — **the libs must
+  be published before the mirror runs**, or `bun install` there 404s.
+  `file:../npm/quadtree` is not an option: it cannot resolve a lib's own
+  `workspace:*` deps from outside the workspace.
 
 - **`assert` is a local shim** (`test/assert.ts`), aliased in `vite.config.ts`.
   Do **not** re-add the npm `assert` package — its polyfill pulls in `process`,
