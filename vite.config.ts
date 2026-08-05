@@ -16,9 +16,8 @@ export default defineConfig({
       assert: fileURLToPath(new URL('./test/assert.ts', import.meta.url)),
     },
   },
-  // Test files call `setFilename(__dirname, __filename)`, shims webpack used to
-  // inject via `node: { __dirname, __filename }`. They only feed a display label
-  // for console grouping, so empty strings are fine in the browser.
+  // Test files call `setFilename(__dirname, __filename)` only to feed a display
+  // label for console grouping, so empty strings are fine in the browser.
   define: {
     __dirname: '""',
     __filename: '""',

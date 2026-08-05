@@ -17,15 +17,7 @@ import {
 
 const ANGLE_CORRECTION = Math.PI / 4;
 
-/**
- * A number, branded so one cannot be passed where a plain number is meant.
- *
- * It used to be declared as the string literal `'[number CellId]'` while
- * holding a number forced through `as any` — the type said one thing, the
- * runtime held another, and the cast switched off the checking that would have
- * said so. Anything that trusted the type (a string operation on an id) was
- * wrong and compiled anyway.
- */
+/** A number, branded so one cannot be passed where a plain number is meant. */
 export type CellId = number & { readonly __brand: 'CellId' };
 
 let lastId = 0;
@@ -89,36 +81,48 @@ export function cellDistance(left: Cell, right: Cell) {
   return magnitude(subtractVectors(left.position, right.position));
 }
 
+/**
+ * `displayScale` multiplies the drawn size and NOTHING else: `radius` and
+ * `vision` are untouched, so the simulation behaves identically at every
+ * setting. Shrinking the drawing is a way to see the flock, not a way to change
+ * it — see AGENTS.md on `vision`.
+ */
 export function renderCell(
   context: CanvasRenderingContext2D,
   { size }: World,
   cell: Cell,
+  displayScale = 1,
 ) {
-  const renderRadius = cell.radius + 10;
+  // The margin is what decides when a cell near an edge gets mirrored on the
+  // other side; it has to cover what is actually drawn.
+  const renderRadius = cell.radius * displayScale + 10;
   const { position: pos } = cell;
 
-  renderAt(context, cell);
+  renderAt(context, cell, displayScale);
 
   if (pos.x - renderRadius < 0) {
-    renderAt(context, cell, { x: pos.x + size.x, y: pos.y });
+    renderAt(context, cell, displayScale, { x: pos.x + size.x, y: pos.y });
   }
   if (pos.x + renderRadius > size.x) {
-    renderAt(context, cell, { x: pos.x - size.x, y: pos.y });
+    renderAt(context, cell, displayScale, { x: pos.x - size.x, y: pos.y });
   }
 
   if (pos.y - renderRadius < 0) {
-    renderAt(context, cell, { x: pos.x, y: pos.y + size.y });
+    renderAt(context, cell, displayScale, { x: pos.x, y: pos.y + size.y });
   }
   if (pos.y + renderRadius > size.y) {
-    renderAt(context, cell, { x: pos.x, y: pos.y - size.y });
+    renderAt(context, cell, displayScale, { x: pos.x, y: pos.y - size.y });
   }
 }
 
 function renderAt(
   context: CanvasRenderingContext2D,
   cell: Cell,
+  displayScale: number,
   pos = cell.position,
 ) {
+  const radius = cell.radius * displayScale;
+
   context.save();
   context.translate(pos.x, pos.y);
 
@@ -128,11 +132,13 @@ function renderAt(
   // A drop, not a disc: three quarters of a circle, then a corner where the
   // remaining quarter would be. Rotated by the heading, that corner is the nose,
   // and the flock reads as a direction instead of as confetti.
-  context.arc(0, 0, cell.radius, 0, Math.PI * 1.5);
-  context.lineTo(cell.radius, -cell.radius);
+  context.arc(0, 0, radius, 0, Math.PI * 1.5);
+  context.lineTo(radius, -radius);
 
   context.closePath();
-  context.lineWidth = 5;
+  // Scaled too, or at small sizes a cell is all outline and no body. Never
+  // thinner than a pixel, or it disappears.
+  context.lineWidth = Math.max(1, 5 * displayScale);
 
   // Each cell outlined in its own colour, filled with the same colour darkened.
   context.strokeStyle = cell.color;

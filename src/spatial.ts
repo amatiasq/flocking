@@ -14,6 +14,13 @@ import { Vector } from './vector';
 export interface CellIndex {
   /** Cells whose centre is within `radius` of `centre`. Not toroidal — see `look`. */
   within(centre: Vector, radius: number): Cell[];
+  /**
+   * Every box the tree split itself into, for the debug overlay. Nothing in the
+   * simulation reads it: where the tree divided is invisible from the outside —
+   * the answers are the same either way — and an index you cannot see is one you
+   * have to take on faith.
+   */
+  quadrants(): Rectangle[];
 }
 
 interface CellEntity extends IQuadEntity {
@@ -21,18 +28,27 @@ interface CellEntity extends IQuadEntity {
 }
 
 const EMPTY: Cell[] = [];
+const NO_QUADRANTS: Rectangle[] = [];
 
-export function indexCells(cells: Cell[]): CellIndex {
-  if (cells.length === 0) return { within: () => EMPTY };
+export function indexCells(cells: Cell[], worldSize?: Vector): CellIndex {
+  if (cells.length === 0) {
+    return { within: () => EMPTY, quadrants: () => NO_QUADRANTS };
+  }
 
-  // Bounds come from the cells, not from the world size. A cell that has walked
-  // past an edge and not yet been pulled back by `roundMap` sits outside the
-  // world, and `Quadnode` throws on an entity its root does not contain rather
-  // than clamping it. Sizing to what is actually there cannot be wrong.
-  let left = Infinity;
-  let top = Infinity;
-  let right = -Infinity;
-  let bottom = -Infinity;
+  // The world when the caller knows it, widened to hold anything outside it. A
+  // cell that has walked past an edge and not yet been pulled back by `roundMap`
+  // sits outside the world, and `Quadnode` throws on an entity its root does not
+  // contain rather than clamping it.
+  //
+  // The bounding box of the cells alone would also be safe, and that is what
+  // this used to be — but it moves a pixel or two every tick, so every quadrant
+  // line drifts and a cell changes quadrant because a DIFFERENT cell moved.
+  // Same answers either way, which is why it went unnoticed until the debug
+  // overlay drew the grid and the whole thing crawled.
+  let left = worldSize ? 0 : Infinity;
+  let top = worldSize ? 0 : Infinity;
+  let right = worldSize ? worldSize.x : -Infinity;
+  let bottom = worldSize ? worldSize.y : -Infinity;
 
   for (const cell of cells) {
     if (cell.position.x < left) left = cell.position.x;
@@ -70,6 +86,10 @@ export function indexCells(cells: Cell[]): CellIndex {
   }
 
   return {
+    quadrants() {
+      return tree.quadrants;
+    },
+
     within(centre: Vector, radius: number) {
       const range = Rectangle.fromCoords(
         centre.y - radius,

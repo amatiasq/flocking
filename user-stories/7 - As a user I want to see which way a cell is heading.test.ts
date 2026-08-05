@@ -11,7 +11,7 @@ setFilename(__dirname, __filename);
 const COLOR = '#abcdef' as Color;
 const WORLD = { size: vector(1000, 1000), look: () => [] };
 
-function draw() {
+function draw(displayScale?: number) {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d')!;
   const cell = createCell({
@@ -21,7 +21,7 @@ function draw() {
     color: COLOR,
   });
 
-  renderCell(context, WORLD, cell);
+  renderCell(context, WORLD, cell, displayScale);
 
   return (context as any).__getEvents() as CanvasRenderingContext2DEvent[];
 }
@@ -62,6 +62,27 @@ test('The drop points where the cell is going', () => {
   const rotations = eventsOfType(events, 'rotate');
 
   assert(rotations.length > 0, 'the shape is rotated by the heading');
+});
+
+// The size slider. It is a RENDER multiplier: `radius` and `vision` never move,
+// so no setting of it can change how the flock behaves — see AGENTS.md.
+test(
+  'The display scale multiplies the drawn size and nothing else',
+  [
+    // scale, expected drawn radius for a radius-20 cell
+    [0.1, 2],
+    [1, 20],
+    [2, 40],
+  ],
+  (scale: number, expected: number) => {
+    const [arc] = eventsOfType(draw(scale), 'arc');
+    assert.equal((arc.props as any).radius, expected);
+  },
+);
+
+test('Omitting the display scale draws the cell at its own radius', () => {
+  const [arc] = eventsOfType(draw(), 'arc');
+  assert.equal((arc.props as any).radius, 20);
 });
 
 test('Each cell wears its own colour, not one colour for all of them', () => {

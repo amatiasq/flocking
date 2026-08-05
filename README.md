@@ -42,6 +42,16 @@ flocking weights, collision friction.
 ## Controls
 
 - **Space** — pause / resume.
+- **← ↑ → ↓** — steer the white cell, the big one.
+- **D** — debug overlay: the quadtree's grid over the flock, and a panel with the
+  frame rate, the milliseconds a step costs, how many cells there are and their
+  average speed.
+- The slider on the right scales how big the cells are **drawn**. The simulation
+  is the same at every setting; below 1 the swarm reads as a flock.
+
+The arrows and space are the browser's scrolling keys, so the page claims them
+(`user.ts`) and does not scroll at all (`index.ts`). Otherwise pressing right
+slides the page and the cell stays where it was.
 
 ## The spec (`user-stories/`)
 
@@ -55,6 +65,10 @@ These were written first, as tests:
   (alignment, cohesion, separation)
 - As a user I want to watch the cells not overlap
 - As a user I want to attract cells when I click
+- As a user I want to see which way a cell is heading
+- As a user I want to control one cell with the arrow keys
+- As a developer I want neighbour lookups to stay exact
+- As a developer I want a debug panel
 
 Still on the list, not yet written:
 
