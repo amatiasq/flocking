@@ -104,8 +104,8 @@ test('The index hands out the boxes it split itself into', () => {
   }
 });
 
-// It used to be the bounding box of the cells, which moves every tick: every
-// line on the screen drifts, and a cell changes quadrant because another moved.
+// Not the bounding box of the cells, which moves every tick: every line on the
+// screen drifts, and a cell changes quadrant because another moved.
 test('The grid stands still while the cells move', () => {
   const box = (position: ReturnType<typeof vector>) =>
     String(indexCells([createCell({ position })], WORLD).quadrants()[0]);

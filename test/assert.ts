@@ -1,8 +1,5 @@
-// Minimal assert, aliased over the Node `assert` module (see vite.config.ts).
-// The npm `assert` polyfill drags in `util`/`process`, which throw
-// `process is not defined` in the browser bundle. Only the tiny surface the
-// tests use is implemented here; it works identically in the browser and in
-// Vitest's node environment.
+// Aliased over the `assert` module (see vite.config.ts) because the npm polyfill
+// drags in `process`, undefined in the browser bundle. Only what the specs use.
 
 export class AssertionError extends Error {
   constructor(message?: string) {
@@ -28,9 +25,7 @@ export function notEqual(actual: unknown, expected: unknown, message?: string) {
   assert(actual != expected, message ?? `${actual} != ${expected}`);
 }
 
-// Enough for the shapes the specs compare: vectors, arrays of them, and whole
-// cells. No cycles, no Map/Set, no prototype check — Node's version does more,
-// and nothing here needs it.
+// Enough for the shapes the specs compare: no cycles, no Map/Set, no prototypes.
 export function deepStrictEqual(
   actual: unknown,
   expected: unknown,

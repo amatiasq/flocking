@@ -3,22 +3,10 @@ import { COLLISION_FRICTION } from '../CONFIGURATION';
 import { World } from '../simulation';
 import { multiplyVectors, normalize } from '../vector';
 
-/**
- * Cells are solid: two of them cannot stand in the same place.
- *
- * This resolves **only the cell it was called with**. Neighbours come from
- * `look()`, which means they belong to the previous frame — writing to one is
- * writing to the frame every other cell is still reading from, and the pair
- * would be resolved twice anyway (once per member) with the outcome depending
- * on array order. Each cell pushing only itself, off the same frozen frame,
- * makes the result order-independent by construction.
- *
- * Half the overlap each, therefore, not all of it: the neighbour applies the
- * other half to itself when its own turn comes, and the pair ends up exactly
- * touching. (The plan this came from said to push by the full overlap; that
- * separates the pair by twice what it needs and would have made every
- * collision a bounce.)
- */
+// Resolves only the cell it was given, by half the overlap: the neighbour is a
+// previous-frame cell everyone else is still reading, and it applies its own
+// half when its turn comes. That makes the pair order-independent and leaves it
+// exactly touching.
 export function solidBody(cell: Cell, { look }: World) {
   const neighbors = look(cell, cell.radius * 2);
 

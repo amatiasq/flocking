@@ -13,10 +13,8 @@ import { random } from './math';
 import { vector } from './vector';
 import { KeyboardKey, onKeyPress } from './user';
 
-// Above the `start()` below, not down next to `createSizeSlider`: a `const` is
-// dead until the line that declares it runs, and `start()` runs at import time.
-// The functions are hoisted, so the call still reaches the slider — and the
-// slider then reads a key that does not exist yet and throws.
+// Above `start()`, which runs at import time: functions hoist, a `const` does
+// not, so declared below the slider would read it before it exists and throw.
 const SIZE_STORAGE_KEY = 'flocking:display-scale';
 
 setStyles();
@@ -46,8 +44,8 @@ function start() {
 
   const cells = array(50, createRandomCell);
 
-  // The one the arrow keys drive. White, and bigger than any random cell, so
-  // you can tell which one you are steering.
+  // The one the arrows drive: white and bigger than any random cell, so you can
+  // tell which one you are steering.
   const [player] = cells;
   player.color = '#ffffff' as Color;
   player.radius = 25;
@@ -55,9 +53,8 @@ function start() {
   const game = simulation({
     canvas,
     cells,
+    // Order is the physics: forces first, `move`, then the position fixups.
     behaviors: [
-      // List behaviors
-      // attractor(vector(500)),
       keyboardControl(player.id),
       flocking,
       move,
@@ -86,8 +83,7 @@ function start() {
       game.step();
     }
 
-    // `undefined` hides the overlay: the frame rate is the only part of it the
-    // simulation cannot measure, so passing it is also how it is asked for.
+    // `undefined` hides the overlay; passing the fps is how it is asked for.
     game.render(sizeSlider.value, isDebug ? fps.fps : undefined);
     requestAnimationFrame(frame);
   });
@@ -97,16 +93,9 @@ function start() {
   }
 }
 
-/**
- * Production only: in `vite dev` a worker serves stale modules and you end up
- * debugging the cache instead of the code. To try it, build and serve `dist/`.
- *
- * The URL is relative to the PAGE on purpose. The site is published under a
- * subpath (`amatiasq.github.io/flocking/`): `/sw.js` would look at the origin
- * root, and `import.meta.url` would resolve against the bundle inside
- * `assets/`. `./sw.js` lands next to the page, which is where it is built, and
- * takes that directory as its scope.
- */
+// Production only: in dev a worker serves stale modules. The URL is relative to
+// the PAGE because the site lives under a subpath — `/sw.js` would look at the
+// origin root and `import.meta.url` would resolve inside `assets/`.
 function registerServiceWorker() {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
     return;
@@ -117,13 +106,8 @@ function registerServiceWorker() {
   });
 }
 
-/**
- * A bare vertical slider over the canvas — no panel, no label — that multiplies
- * the drawn size of every cell. It scales the picture and not the simulation:
- * `radius` and `vision` never change, so the flock behaves the same at every
- * setting. Down is where it is interesting: at 0.2 the swarm reads as a flock
- * instead of as a pile.
- */
+// Scales the picture, never the simulation: `radius` and `vision` never change.
+// Down is where it is interesting — at 0.2 the swarm reads as a flock.
 function createSizeSlider() {
   const input = document.createElement('input');
 
@@ -172,9 +156,8 @@ function setStyles() {
     margin: 0,
     padding: 0,
     height: '100%',
-    // A canvas is an inline element, so the line box it sits in leaves room for
-    // a descender under it and the page is a few pixels taller than the screen.
-    // That sliver is a scrollbar, and a page that scrolls eats the arrow keys.
+    // The canvas's inline line box makes the page a few pixels too tall, and a
+    // page that scrolls eats the arrow keys.
     overflow: 'hidden',
   };
 

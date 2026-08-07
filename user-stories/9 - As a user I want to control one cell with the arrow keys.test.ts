@@ -111,12 +111,8 @@ test('Opposite arrows cancel out', () => {
   deepStrictEqual(sim.cells[0].acceleration, vector(0));
 });
 
-/**
- * The arrows are the browser's scroll keys before they are anything else, so
- * pressing right used to slide the page and leave the cell where it was. The
- * page is `overflow: hidden` now as well — belt and braces, because a page that
- * cannot scroll still gives the key away to whatever else is listening.
- */
+// Unclaimed, pressing right slides the page and leaves the cell where it was.
+// `overflow: hidden` is belt and braces: it does not stop other listeners.
 test('The keys it steers with are taken from the page', () => {
   // Any call wires the listeners up, once, for the whole module.
   isKeyDown(KeyboardKey.SPACE);

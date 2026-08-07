@@ -4,18 +4,9 @@ import { Behavior } from '../simulation';
 import { isKeyDown, KeyboardKey } from '../user';
 import { isZero, normalize, vector } from '../vector';
 
-/**
- * Steer one cell with the arrow keys. It keeps flocking, colliding and wrapping
- * like any other cell — the arrows add one more force, they do not take over.
- *
- * A force, not a velocity: `steer` limits the correction to `MAX_FORCE` and
- * `move` caps the result at `MAX_SPEED`, so the driven cell obeys the same
- * limits as the rest. Writing `velocity` directly would make it a different
- * kind of object, and `solidBody` would hand that illegal velocity to whatever
- * it hit.
- *
- * `isDown` is a parameter so a spec can drive it without a keyboard.
- */
+// A force and not a velocity, so the driven cell obeys the same MAX_FORCE and
+// MAX_SPEED as the rest — otherwise `solidBody` hands an illegal velocity to
+// whatever it hits. `isDown` is a parameter so a spec can drive it.
 export function keyboardControl(
   target: CellId,
   isDown: (key: KeyboardKey) => boolean = isKeyDown,

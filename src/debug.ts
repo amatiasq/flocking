@@ -2,27 +2,16 @@ import { Rectangle } from '@amatiasq/geometry';
 import { Cell } from './cell';
 import { magnitude } from './vector';
 
-/**
- * The numbers the canvas cannot show, and the quadtree's own grid. **D** toggles
- * both. Same panel as `lulas/src/debug.ts`, and deliberately a separate copy:
- * the two simulations share no code and what is worth watching differs — there
- * is no energy budget here, and average speed is the number that says whether
- * the flock is flowing or grinding against itself.
- *
- * The measuring lives here and the DOM stays in `index.ts`: the page feeds
- * `requestAnimationFrame` timestamps into `fpsMeter` and hands the stats back to
- * be drawn, so everything below is reachable from a spec.
- */
+// The measuring lives here and the DOM stays in `index.ts`, so a spec can reach
+// all of it. A deliberate copy of `lulas/src/debug.ts`, not shared code: the two
+// simulations have nothing else in common and watch different numbers.
 export interface DebugStats {
   /** Animation frames per second — what the browser draws, not what it simulates. */
   fps: number;
   /** Milliseconds one simulation step costs, averaged. 0 before the first one. */
   msPerTick: number;
   cells: number;
-  /**
-   * Pixels per tick, averaged over the flock. Collisions trade velocity, so a
-   * flock packed tight runs well under MAX_SPEED — this is where that shows.
-   */
+  /** Pixels per tick. Collisions trade velocity, so a packed flock runs slow. */
   averageSpeed: number;
 }
 
@@ -32,8 +21,7 @@ const PANEL_WIDTH = 180;
 const LINE_HEIGHT = 15;
 const FONT = '12px ui-monospace, SFMono-Regular, Menlo, monospace';
 
-// Dim on purpose: the grid is a hundred boxes over the flock and the cells have
-// to stay the thing you are looking at.
+// Dim on purpose: a hundred boxes must not outshine the cells under them.
 const QUADRANT_COLOR = 'rgba(120, 160, 255, 0.28)';
 
 const PANEL_BACKGROUND = 'rgba(0, 0, 0, 0.72)';
@@ -57,11 +45,8 @@ export function rollingAverage(size = 30) {
   };
 }
 
-/**
- * Frames per second from the timestamps the page already receives. Averaged over
- * the gaps rather than counted per second: a count needs a second to say
- * anything, and the panel is opened to watch a number move.
- */
+// Averaged over the frame gaps, not counted per second: a count needs a whole
+// second to say anything, and the panel is opened to watch a number move.
 export function fpsMeter(size = 30) {
   const gaps = rollingAverage(size);
   let previous = 0;
@@ -85,10 +70,7 @@ export function averageSpeed(cells: Cell[]) {
   return total / cells.length;
 }
 
-/**
- * The panel's contents as text, separately from drawing them: a spec can read
- * these, and nothing about what the panel SAYS depends on a canvas.
- */
+// The panel's text, apart from the drawing, so what it says needs no canvas.
 export function debugRows(stats: DebugStats): [string, string][] {
   return [
     ['fps', Math.round(stats.fps).toString()],
@@ -98,12 +80,8 @@ export function debugRows(stats: DebugStats): [string, string][] {
   ];
 }
 
-/**
- * The tree's own boxes, over the flock. Where a quadtree divided is the whole of
- * what it does and it is invisible from the outside — `look` answers the same
- * with it and without it — so this is the only way to see it working: a tight
- * knot of cells becomes a knot of small squares and empty space stays one box.
- */
+// Where the tree divided is invisible from the outside — `look` answers the same
+// either way — so this is the only way to see the index working.
 export function renderQuadrants(
   context: CanvasRenderingContext2D,
   quadrants: Rectangle[],
@@ -147,8 +125,7 @@ export function renderDebugPanel(
     context.fillStyle = LABEL_COLOR;
     context.fillText(label, left, y);
 
-    // Right-aligned, so the digits line up and a changing number does not make
-    // the whole row shuffle sideways.
+    // Right-aligned, or a changing number shuffles the whole row sideways.
     context.textAlign = 'right';
     context.fillStyle = VALUE_COLOR;
     context.fillText(value, right, y);

@@ -16,7 +16,6 @@ export function lowerColor(color: Color, percent: number) {
   rgba.r *= percent;
   rgba.g *= percent;
   rgba.b *= percent;
-  // rgba.a *= percent;
   return toString(rgba);
 }
 

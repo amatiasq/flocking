@@ -29,14 +29,8 @@ function draw(displayScale?: number) {
 const eventsOfType = (events: CanvasRenderingContext2DEvent[], type: string) =>
   events.filter((event) => event.type === type);
 
-// A cell is a DROP, not a disc: three quarters of a circle plus a corner where
-// the missing quarter would be, rotated by the heading. That is the only thing
-// on screen that says which way anything is going.
-//
-// It was turned off for five years by a work-in-progress commit ("I was doing
-// something here...", 2021-04-16) that put it behind a `const withBeak = false`,
-// and nobody noticed — the project's own screenshot on amatiasq.com still showed
-// the drops. Hence this spec.
+// The nose is the only thing on screen that says which way anything is going,
+// and it once spent five years switched off behind a flag with nobody noticing.
 test('A cell is drawn as a drop, with a nose', () => {
   const events = draw();
   const arcs = eventsOfType(events, 'arc');

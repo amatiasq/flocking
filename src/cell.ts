@@ -51,13 +51,8 @@ export function createCell(partial?: Partial<Cell>): Cell {
   };
 }
 
-/**
- * The next frame's copy of a cell. Deep on the three mutable vectors and only
- * those: `{ ...cell }` shares them with the previous frame, so a behaviour that
- * writes `position.x` in place scribbles on the very cell `look()` is still
- * handing to everyone else in the same pass. Kept here, next to `Cell`, so the
- * copy list cannot drift from the shape.
- */
+// Deep on the three mutable vectors: `{ ...cell }` shares them with the previous
+// frame, which `look()` is still handing to everyone else in the same pass.
 export function cloneCell(cell: Cell): Cell {
   return {
     ...cell,
@@ -81,20 +76,16 @@ export function cellDistance(left: Cell, right: Cell) {
   return magnitude(subtractVectors(left.position, right.position));
 }
 
-/**
- * `displayScale` multiplies the drawn size and NOTHING else: `radius` and
- * `vision` are untouched, so the simulation behaves identically at every
- * setting. Shrinking the drawing is a way to see the flock, not a way to change
- * it — see AGENTS.md on `vision`.
- */
+// `displayScale` multiplies the drawn size and nothing else: `radius` and
+// `vision` are untouched, so the simulation is identical at every setting.
 export function renderCell(
   context: CanvasRenderingContext2D,
   { size }: World,
   cell: Cell,
   displayScale = 1,
 ) {
-  // The margin is what decides when a cell near an edge gets mirrored on the
-  // other side; it has to cover what is actually drawn.
+  // Decides when a cell near an edge is mirrored on the other side, so it has
+  // to cover what is actually drawn.
   const renderRadius = cell.radius * displayScale + 10;
   const { position: pos } = cell;
 
@@ -129,18 +120,15 @@ function renderAt(
   context.rotate(radians(cell.velocity) + ANGLE_CORRECTION);
   context.beginPath();
 
-  // A drop, not a disc: three quarters of a circle, then a corner where the
-  // remaining quarter would be. Rotated by the heading, that corner is the nose,
-  // and the flock reads as a direction instead of as confetti.
+  // A drop, not a disc: rotated by the heading, the corner is a nose, and the
+  // flock reads as a direction instead of as confetti.
   context.arc(0, 0, radius, 0, Math.PI * 1.5);
   context.lineTo(radius, -radius);
 
   context.closePath();
-  // Scaled too, or at small sizes a cell is all outline and no body. Never
-  // thinner than a pixel, or it disappears.
+  // Scaled too, or at small sizes a cell is all outline and no body.
   context.lineWidth = Math.max(1, 5 * displayScale);
 
-  // Each cell outlined in its own colour, filled with the same colour darkened.
   context.strokeStyle = cell.color;
   context.fillStyle = lowerColor(cell.color, 0.5);
   context.stroke();
