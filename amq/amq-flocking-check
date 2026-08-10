@@ -5,15 +5,6 @@
 # the same steps CI does: tests with coverage, then typecheck + build. Runtime is
 # Bun, like CI.
 
-case "$1" in
-  -h|--help)
-    echo "Usage: amq flocking check — run the full CI check (Bun)"
-    echo
-    echo "  bun install (if needed) + test-with-coverage + (typecheck && build)"
-    echo "Mirrors .github/workflows/ci.yml. Does nothing else."
-    exit 0;;
-esac
-
 if [ ! -d node_modules ]; then
   echo "==> bun install"; bun install --frozen-lockfile
 else
