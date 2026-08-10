@@ -64,7 +64,7 @@ test('The panel shows what is going on', () => {
   equal(rows.get('fps'), '60');
   equal(rows.get('cells'), '1');
   equal(rows.get('speed'), '5.00 px');
-  ok(rows.get('tick')!.endsWith('ms'), rows.get('tick'));
+  ok(rows.get('tick')!.endsWith('ms'), rows.get('tick')!);
 });
 
 test('It measures how long a step takes, once one has been taken', () => {
