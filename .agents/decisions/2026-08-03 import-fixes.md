@@ -2,7 +2,7 @@
 
 #1 landed with the quadtree, because a frozen spatial index and a half-shared
 frame cannot both be right — see
-[`../../.agents/decisions/2026-08-03 quadtree-in-flocking-and-lulas.md`](../../.agents/decisions/2026-08-03%20quadtree-in-flocking-and-lulas.md).
+[`../../.agents/decisions/2026-08-03 quadtree-in-flocking-and-lulas.md`](../../../.agents/decisions/2026-08-03%20quadtree-in-flocking-and-lulas.md).
 
 ## #3 — `solidBody` resolves one cell, and only one
 
