@@ -3,6 +3,9 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    // Same as `resolve.conditions` in `vite.config.ts`, same reason: without
+    // `bun`, `@amatiasq/*` resolves to `dist/index.d.ts`, which is gitignored.
+    "customConditions": ["bun"],
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": ["node", "vite/client", "vitest/globals"],
     "sourceMap": true,
