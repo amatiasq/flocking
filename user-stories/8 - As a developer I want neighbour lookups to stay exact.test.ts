@@ -12,11 +12,9 @@ const SIZE = 400;
 
 /**
  * `look()` is answered by a quadtree now, so "same answer as scanning every
- * cell" stopped being true by construction and became something to prove. A
- * missing neighbour is invisible in the running sim — the flock just behaves a
- * little differently — so this is the spec that catches it.
- *
- * Deterministic on purpose: a seeded generator means a failure is reproducible.
+ * cell" became something to prove: a missing neighbour is invisible in the
+ * running sim. Deterministic on purpose — a seeded generator makes a failure
+ * reproducible.
  */
 function randoms(seed: number) {
   let state = seed;
