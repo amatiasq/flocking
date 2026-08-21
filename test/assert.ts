@@ -1,7 +1,7 @@
 // Aliased over the `assert` module (see vite.config.ts) because the npm polyfill
 // drags in `process`, undefined in the browser bundle. Only what the specs use.
 
-export class AssertionError extends Error {
+class AssertionError extends Error {
   constructor(message?: string) {
     super(message || 'Assertion failed');
     this.name = 'AssertionError';
