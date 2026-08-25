@@ -2,28 +2,29 @@
 /**
  * amq flocking build-sw — generate dist/sw.js from the built site.
  *
- * The simulation has no server state at all: an index.html, one bundle and a canvas. So the
- * worker PRECACHES everything `vite build` emitted and serves it cache-first. The file list
- * is only known at build time (hashed names), and the cache name is a hash of the list AND
- * the contents, so any deploy that changes a byte ships a new cache and drops the old one.
+ * No server state at all, so the worker PRECACHES everything `vite build` emitted and
+ * serves it cache-first. The cache name hashes the contents, so any deploy that changes
+ * a byte ships a new cache and drops the old one. Reads dist/, so it must run AFTER
+ * `vite build` — `bun run build` chains it.
  *
- * Reads dist/, so it must run AFTER `vite build` — `bun run build` chains it, and that is
- * normally the only place it is invoked from.
+ * The site is published under a SUBPATH (amatiasq.github.io/flocking/), so every URL is
+ * RELATIVE and resolved at runtime against the worker's own scope; absolute `/asset`
+ * URLs would point at the origin root and cache nothing.
  *
- * Adapted from `lulas/amq/amq-lulas-build-sw`, with one difference that matters: this site
- * is published under a SUBPATH (amatiasq.github.io/flocking/), which is why `vite.config.ts`
- * sets `base: './'`. Absolute `/asset` URLs would point at the origin root and cache
- * nothing. Every URL here is therefore RELATIVE and resolved at runtime against the
- * worker's own scope, so the same sw.js works from a subpath, from the domain root and
- * from `bun run preview`.
- *
- * Plain JS on purpose: an `amq` command is an executable with no extension, so node cannot
- * type-strip it.
+ * Plain JS on purpose: an `amq` command is an executable with no extension, so node
+ * cannot type-strip it.
  */
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+if (['-h', '--help', 'help'].includes(process.argv[2])) {
+  const src = readFileSync(fileURLToPath(import.meta.url), 'utf8');
+  console.log(src.slice(0, src.indexOf('*/')).split('\n').slice(1).map((l) => l.replace(/^\s*\/?\*+ ?/, '')).join('\n').trim());
+  process.exit(0);
+}
 
 // amq/ sits at the project root, so `..` is flocking/.
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
