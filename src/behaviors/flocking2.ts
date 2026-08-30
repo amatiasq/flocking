@@ -14,24 +14,14 @@ import {
   multiplyVectors,
   normalize,
   subtractVectors,
-  sumVectorList,
   sumVectors,
   Vector,
   vector,
 } from '../vector';
 
-export const flocking = requireNeighbors(flockingCore);
 export const alignementBehavior = requireNeighbors(alignement);
 export const cohesionBehavior = requireNeighbors(cohesion);
 export const separationBehavior = requireNeighbors(separation);
-
-function flockingCore(cell: Cell, neighbors: Cell[]) {
-  return sumVectorList([
-    alignement(cell, neighbors),
-    cohesion(cell, neighbors),
-    separation(cell, neighbors),
-  ]);
-}
 
 function alignement(cell: Cell, neighbors: Cell[]) {
   const sum = neighbors.reduce(

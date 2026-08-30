@@ -23,7 +23,7 @@ export interface SimulationConfig {
   worldSize?: Vector;
 }
 
-export function simulation({
+function simulation({
   canvas,
   cells,
   behaviors,
