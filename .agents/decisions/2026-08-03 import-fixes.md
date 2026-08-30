@@ -2,7 +2,7 @@
 
 #1 landed with the quadtree — a frozen spatial index and a half-shared frame
 cannot both be right:
-[the quadtree decision](../../../.agents/decisions/2026-08-03%20quadtree-in-flocking-and-lulas.md).
+[the quadtree decision](../../../../.agents/decisions/2026-08-03%20quadtree-in-flocking-and-lulas.md).
 
 **#3 — `solidBody` resolves one cell, itself, by half the overlap**, and writes
 nothing to `other`. It used to push both members and swap velocities, so a pair
