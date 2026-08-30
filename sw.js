@@ -7,9 +7,9 @@
  * Every asset is listed RELATIVE to this worker's scope: the site is published under a
  * subpath and an absolute path would miss.
  */
-const CACHE = 'flocking-adda360b0908';
+const CACHE = 'flocking-ac988e63fc65';
 const ASSETS = [
-  "assets/index-uCb8kxWC.js",
+  "assets/index-Cmtdq5fc.js",
   "",
   "index.html"
 ];

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1787618777531" clover="3.2.0">
-  <project timestamp="1787618777531" name="All files">
-    <metrics statements="355" coveredstatements="329" conditionals="148" coveredconditionals="127" methods="115" coveredmethods="99" elements="618" coveredelements="555" complexity="0" loc="355" ncloc="355" packages="3" files="21" classes="21"/>
+<coverage generated="1788082356001" clover="3.2.0">
+  <project timestamp="1788082356001" name="All files">
+    <metrics statements="353" coveredstatements="328" conditionals="148" coveredconditionals="127" methods="114" coveredmethods="99" elements="615" coveredelements="554" complexity="0" loc="353" ncloc="353" packages="3" files="21" classes="21"/>
     <package name="src">
       <metrics statements="205" coveredstatements="190" conditionals="77" coveredconditionals="69" methods="72" coveredmethods="59"/>
       <file name="CONFIGURATION.ts" path="/home/runner/work/flocking/flocking/src/CONFIGURATION.ts">
@@ -238,7 +238,7 @@
       </file>
     </package>
     <package name="src.behaviors">
-      <metrics statements="114" coveredstatements="107" conditionals="39" coveredconditionals="33" methods="29" coveredmethods="27"/>
+      <metrics statements="112" coveredstatements="106" conditionals="39" coveredconditionals="33" methods="28" coveredmethods="27"/>
       <file name="attractor.ts" path="/home/runner/work/flocking/flocking/src/behaviors/attractor.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
         <line num="6" count="4" type="stmt"/>
@@ -289,47 +289,45 @@
         <line num="72" count="28" type="stmt"/>
       </file>
       <file name="flocking2.ts" path="/home/runner/work/flocking/flocking/src/behaviors/flocking2.ts">
-        <metrics statements="40" coveredstatements="36" conditionals="6" coveredconditionals="3" methods="9" coveredmethods="8"/>
+        <metrics statements="38" coveredstatements="35" conditionals="6" coveredconditionals="3" methods="8" coveredmethods="8"/>
+        <line num="22" count="1" type="stmt"/>
         <line num="23" count="1" type="stmt"/>
         <line num="24" count="1" type="stmt"/>
-        <line num="25" count="1" type="stmt"/>
-        <line num="26" count="1" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="37" count="12" type="stmt"/>
-        <line num="38" count="12" type="stmt"/>
-        <line num="42" count="12" type="stmt"/>
-        <line num="43" count="12" type="stmt"/>
-        <line num="44" count="12" type="stmt"/>
-        <line num="45" count="12" type="stmt"/>
-        <line num="49" count="8" type="stmt"/>
-        <line num="50" count="8" type="stmt"/>
+        <line num="27" count="12" type="stmt"/>
+        <line num="28" count="12" type="stmt"/>
+        <line num="32" count="12" type="stmt"/>
+        <line num="33" count="12" type="stmt"/>
+        <line num="34" count="12" type="stmt"/>
+        <line num="35" count="12" type="stmt"/>
+        <line num="39" count="8" type="stmt"/>
+        <line num="40" count="8" type="stmt"/>
+        <line num="44" count="8" type="stmt"/>
+        <line num="45" count="8" type="stmt"/>
+        <line num="46" count="8" type="stmt"/>
+        <line num="47" count="8" type="stmt"/>
+        <line num="51" count="8" type="stmt"/>
+        <line num="52" count="8" type="stmt"/>
         <line num="54" count="8" type="stmt"/>
         <line num="55" count="8" type="stmt"/>
         <line num="56" count="8" type="stmt"/>
-        <line num="57" count="8" type="stmt"/>
-        <line num="61" count="8" type="stmt"/>
+        <line num="58" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="59" count="0" type="stmt"/>
         <line num="62" count="8" type="stmt"/>
+        <line num="63" count="8" type="stmt"/>
         <line num="64" count="8" type="stmt"/>
         <line num="65" count="8" type="stmt"/>
         <line num="66" count="8" type="stmt"/>
-        <line num="68" count="8" type="cond" truecount="1" falsecount="1"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="72" count="8" type="stmt"/>
+        <line num="69" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="70" count="0" type="stmt"/>
         <line num="73" count="8" type="stmt"/>
         <line num="74" count="8" type="stmt"/>
         <line num="75" count="8" type="stmt"/>
-        <line num="76" count="8" type="stmt"/>
-        <line num="79" count="8" type="cond" truecount="1" falsecount="1"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="83" count="8" type="stmt"/>
-        <line num="84" count="8" type="stmt"/>
-        <line num="85" count="8" type="stmt"/>
-        <line num="91" count="4" type="stmt"/>
-        <line num="92" count="28" type="stmt"/>
-        <line num="94" count="28" type="cond" truecount="1" falsecount="1"/>
-        <line num="95" count="0" type="stmt"/>
-        <line num="98" count="28" type="stmt"/>
-        <line num="99" count="28" type="stmt"/>
+        <line num="81" count="3" type="stmt"/>
+        <line num="82" count="28" type="stmt"/>
+        <line num="84" count="28" type="cond" truecount="1" falsecount="1"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="88" count="28" type="stmt"/>
+        <line num="89" count="28" type="stmt"/>
       </file>
       <file name="keyboardControl.ts" path="/home/runner/work/flocking/flocking/src/behaviors/keyboardControl.ts">
         <metrics statements="8" coveredstatements="8" conditionals="9" coveredconditionals="9" methods="3" coveredmethods="3"/>
