@@ -2,7 +2,7 @@
 
 A boids simulation on canvas, built TDD-first: the specs in `user-stories/` are
 the spec, and `src/simulation.ts` is the engine. The predator/prey simulation is
-a different project, [`lulas/`](../lulas/); they share `@amatiasq/quadtree` and
+a different project, [`amatiasq/lulas`](https://github.com/amatiasq/lulas); they share `@amatiasq/quadtree` and
 nothing else.
 
 ## Glossary
@@ -91,5 +91,3 @@ Two things the comparison had to control for, and one it cannot:
   order, so the force sums round differently and a chaotic system walks away
   from itself. **The sets are identical** — that is what user story 8 proves,
   over seeded random layouts.
-
-History: [`.agents/decisions/`](.agents/decisions).
